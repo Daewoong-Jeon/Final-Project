@@ -64,5 +64,3 @@ Following problems may be occurred:
 1. CrashLoopBackOff: The spring application is not running properly. If you didn't provide the kafka installation on the kubernetes, the application may crash. Please install kafka firstly:
 
 https://labs.msaez.io/#/courses/cna-full/full-course-cna/ops-utility
-
-test
