@@ -13,20 +13,13 @@ spec:
     metadata:
       labels:
         app: rental
+        sidecar.istio.io/inject: "true" # Pod 레이블 추가
     spec:
       containers:
         - name: rental
-          image: "username/rental:latest"
+          image: "user13.azurecr.io/rental:latest"
           ports:
             - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 10
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 10
           livenessProbe:
             httpGet:
               path: '/actuator/health'
@@ -35,3 +28,16 @@ spec:
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 5
+          env:
+            - name: RENTAL_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-dev
+                  key: RENTAL_LOG_LEVEL
+          volumeMounts:
+            - mountPath: "/mnt/data"
+              name: volume
+      volumes:
+        - name: volume
+          persistentVolumeClaim:
+            claimName: azurefile

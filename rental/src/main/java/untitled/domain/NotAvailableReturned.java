@@ -1,16 +1,15 @@
 package untitled.domain;
 
+import untitled.domain.*;
 import java.util.*;
 import lombok.*;
-import untitled.domain.*;
 import untitled.infra.AbstractEvent;
 
 @Data
 @ToString
-public class RentalStatusUpdated extends AbstractEvent {
+public class NotAvailableReturned extends AbstractEvent {
 
-    private String memberId;
-    private Integer cost;
     private String id;
+    private String memberId;
     private String status;
 }

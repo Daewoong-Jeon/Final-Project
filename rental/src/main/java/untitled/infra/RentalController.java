@@ -19,5 +19,44 @@ public class RentalController {
 
     @Autowired
     RentalRepository rentalRepository;
+
+    @RequestMapping(
+            value = "/rentals/rentbook",
+            method = RequestMethod.POST,
+            produces = "application/json;charset=UTF-8"
+    )
+    public Rental rentBook(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestBody RentBookCommand rentBookCommand
+    ) throws Exception {
+        System.out.println("##### /rental/rentBook  called #####");
+        Rental rental = new Rental();
+        rental.rentBook(rentBookCommand);
+        rentalRepository.save(rental);
+        return rental;
+    }
+
+    @RequestMapping(
+            value = "/rentals/{id}/returnbook",
+            method = RequestMethod.PUT,
+            produces = "application/json;charset=UTF-8"
+    )
+    public Rental returnBook(
+            @PathVariable(value = "id") Long id,
+            @RequestBody ReturnBookCommand returnBookCommand,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws Exception {
+        System.out.println("##### /rental/returnBook  called #####");
+        Optional<Rental> optionalRental = rentalRepository.findById(id);
+
+        optionalRental.orElseThrow(() -> new Exception("No Entity Found"));
+        Rental rental = optionalRental.get();
+        rental.returnBook(returnBookCommand);
+
+        rentalRepository.save(rental);
+        return rental;
+    }
 }
 //>>> Clean Arch / Inbound Adaptor

@@ -11,4 +11,6 @@ public class BookRent extends AbstractEvent {
 
     private String memberId;
     private String bookId;
+    private Date rentalDate;
+    private Date requiredReturnDate;
 }

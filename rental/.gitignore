@@ -44,3 +44,7 @@ secrets.yml
 node_modules
 .dist/
 .pem
+.gitignore
+.msaez
+.nvmrc
+.vscode

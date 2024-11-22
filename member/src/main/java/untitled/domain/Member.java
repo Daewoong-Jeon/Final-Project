@@ -25,18 +25,20 @@ public class Member {
 
     @PostPersist
     public void onPostPersist() {
-        RentalPointDecreased rentalPointDecreased = new RentalPointDecreased(
-            this
-        );
-        rentalPointDecreased.publishAfterCommit();
-
-        RentalPointIncreased rentalPointIncreased = new RentalPointIncreased(
-            this
-        );
-        rentalPointIncreased.publishAfterCommit();
-
-        RentalPointCharged rentalPointCharged = new RentalPointCharged(this);
-        rentalPointCharged.publishAfterCommit();
+//        RentalPointDecreased rentalPointDecreased = new RentalPointDecreased(
+//            this
+//        );
+//        rentalPointDecreased.publishAfterCommit();
+//
+//        RentalPointIncreased rentalPointIncreased = new RentalPointIncreased(
+//            this
+//        );
+//        rentalPointIncreased.publishAfterCommit();
+//
+//        LackOfPointsReturned lackOfPointsReturned = new LackOfPointsReturned(
+//                this
+//        );
+//        lackOfPointsReturned.publishAfterCommit();
     }
 
     public static MemberRepository repository() {
@@ -45,6 +47,19 @@ public class Member {
         );
         return memberRepository;
     }
+
+    //<<< Clean Arch / Port Method
+    public void chargeRentalPoint(
+            ChargeRentalPointCommand chargeRentalPointCommand
+    ) {
+        setRentalPoint(getRentalPoint() + chargeRentalPointCommand.getRentalPoint());
+
+        RentalPointCharged rentalPointCharged = new RentalPointCharged(this);
+        rentalPointCharged.publishAfterCommit();
+
+    }
+
+    //>>> Clean Arch / Port Method
 
     //<<< Clean Arch / Port Method
     public static void decreaseRentalPoint(
@@ -58,20 +73,36 @@ public class Member {
 
         RentalPointDecreased rentalPointDecreased = new RentalPointDecreased(member);
         rentalPointDecreased.publishAfterCommit();
+
+         LackOfPointsReturned lackOfPointsReturned = new LackOfPointsReturned(member);
+         lackOfPointsReturned.publishAfterCommit();
         */
 
-        /** Example 2:  finding and process
+        // Example 2:  finding and process
         
-        repository().findById(rentalStatusUpdated.get???()).ifPresent(member->{
-            
-            member // do something
-            repository().save(member);
+        repository().findById(rentalStatusUpdated.getMemberId()).ifPresent(member->{
+            if (member.getRentalPoint() - rentalStatusUpdated.getCost() >= 0) {
 
-            RentalPointDecreased rentalPointDecreased = new RentalPointDecreased(member);
-            rentalPointDecreased.publishAfterCommit();
+                member.setRentalPoint(member.getRentalPoint() - rentalStatusUpdated.getCost());
+                repository().save(member);
+
+                RentalPointDecreased rentalPointDecreased = new RentalPointDecreased(member);
+                rentalPointDecreased.publishAfterCommit();
+
+            } else {
+
+                LackOfPointsReturned lackOfPointsReturned = new LackOfPointsReturned();
+                lackOfPointsReturned.setId(member.getId());
+                lackOfPointsReturned.setRentalPoint(member.getRentalPoint());
+                lackOfPointsReturned.setBookId(rentalStatusUpdated.getId());
+                lackOfPointsReturned.publishAfterCommit();
+
+//                LackOfPointsReturned lackOfPointsReturned = new LackOfPointsReturned(member);
+//                lackOfPointsReturned.publishAfterCommit();
+
+            }
 
          });
-        */
 
     }
 
@@ -90,18 +121,17 @@ public class Member {
         rentalPointIncreased.publishAfterCommit();
         */
 
-        /** Example 2:  finding and process
+        // Example 2:  finding and process
         
-        repository().findById(availableStatusUpdated.get???()).ifPresent(member->{
-            
-            member // do something
+        repository().findById(availableStatusUpdated.getMemberId()).ifPresent(member->{
+
+            member.setRentalPoint(member.getRentalPoint() + availableStatusUpdated.getCost());
             repository().save(member);
 
             RentalPointIncreased rentalPointIncreased = new RentalPointIncreased(member);
             rentalPointIncreased.publishAfterCommit();
 
          });
-        */
 
     }
     //>>> Clean Arch / Port Method

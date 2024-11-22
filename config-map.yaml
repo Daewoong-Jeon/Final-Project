@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-dev
+  namespace: default
+data:
+  VIEW_LOG_LEVEL: DEBUG
+  BOOK_LOG_LEVEL: INFO
+  RENTAL_LOG_LEVEL: INFO
+  MEMBER_LOG_LEVEL: DEBUG

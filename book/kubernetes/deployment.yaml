@@ -13,20 +13,24 @@ spec:
     metadata:
       labels:
         app: book
+        sidecar.istio.io/inject: "true" # Pod 레이블 추가
     spec:
       containers:
         - name: book
           image: "user13.azurecr.io/book:latest"
           ports:
             - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 10
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 10
+          resources:
+            requests:
+              cpu: "200m"
+#          readinessProbe:
+#            httpGet:
+#              path: '/actuator/health'
+#              port: 8080
+#            initialDelaySeconds: 10
+#            timeoutSeconds: 2
+#            periodSeconds: 5
+#            failureThreshold: 10
           livenessProbe:
             httpGet:
               path: '/actuator/health'
@@ -35,3 +39,16 @@ spec:
             timeoutSeconds: 2
             periodSeconds: 5
             failureThreshold: 5
+          env:
+            - name: BOOK_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-dev
+                  key: BOOK_LOG_LEVEL
+          volumeMounts:
+            - mountPath: "/mnt/data"
+              name: volume
+      volumes:
+        - name: volume
+          persistentVolumeClaim:
+            claimName: azurefile

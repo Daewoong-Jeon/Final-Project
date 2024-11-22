@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REGISTRY = 'user13.azurecr.io'
-        IMAGE_NAME = 'book'
+        IMAGE_NAME = 'rental'
         AKS_CLUSTER = 'user13-aks'
         RESOURCE_GROUP = 'user13-rsrcgrp'
         AKS_NAMESPACE = 'default'

@@ -19,5 +19,27 @@ public class MemberController {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @RequestMapping(
+            value = "/members/{id}/chargerentalpoint",
+            method = RequestMethod.PUT,
+            produces = "application/json;charset=UTF-8"
+    )
+    public Member chargeRentalPoint(
+            @PathVariable(value = "id") String id,
+            @RequestBody ChargeRentalPointCommand chargeRentalPointCommand,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws Exception {
+        System.out.println("##### /member/chargeRentalPoint  called #####");
+        Optional<Member> optionalMember = memberRepository.findById(id);
+
+        optionalMember.orElseThrow(() -> new Exception("No Entity Found"));
+        Member member = optionalMember.get();
+        member.chargeRentalPoint(chargeRentalPointCommand);
+
+        memberRepository.save(member);
+        return member;
+    }
 }
 //>>> Clean Arch / Inbound Adaptor

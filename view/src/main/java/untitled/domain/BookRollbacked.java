@@ -6,10 +6,9 @@ import lombok.Data;
 import untitled.infra.AbstractEvent;
 
 @Data
-public class RentalStatusUpdated extends AbstractEvent {
+public class BookRollbacked extends AbstractEvent {
 
-    private String memberId;
-    private Integer cost;
     private String id;
+    private String memberId;
     private String status;
 }

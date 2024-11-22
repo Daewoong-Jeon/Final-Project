@@ -25,22 +25,25 @@ public class Book {
 
     private Integer cost;
 
-    private Date rentalDate;
-
-    private Date requiredReturnDate;
 
     @PostPersist
     public void onPostPersist() {
-        RentalStatusUpdated rentalStatusUpdated = new RentalStatusUpdated(this);
-        rentalStatusUpdated.publishAfterCommit();
-
-        AvailableStatusUpdated availableStatusUpdated = new AvailableStatusUpdated(
-            this
-        );
-        availableStatusUpdated.publishAfterCommit();
-
+//        RentalStatusUpdated rentalStatusUpdated = new RentalStatusUpdated(this);
+//        rentalStatusUpdated.publishAfterCommit();
+//
+//        AvailableStatusUpdated availableStatusUpdated = new AvailableStatusUpdated(
+//            this
+//        );
+//        availableStatusUpdated.publishAfterCommit();
+//
         BookAdded bookAdded = new BookAdded(this);
         bookAdded.publishAfterCommit();
+
+//        NotAvailableReturned notAvailableReturned = new NotAvailableReturned(this);
+//        notAvailableReturned.publishAfterCommit();
+//
+//        BookRollbacked bookRollbacked = new BookRollbacked(this);
+//        bookRollbacked.publishAfterCommit();
     }
 
     public static BookRepository repository() {
@@ -60,20 +63,42 @@ public class Book {
 
         RentalStatusUpdated rentalStatusUpdated = new RentalStatusUpdated(book);
         rentalStatusUpdated.publishAfterCommit();
+
+        NotAvailableReturned notAvailableReturned = new NotAvailableReturned(this);
+        notAvailableReturned.publishAfterCommit();
         */
 
-        /** Example 2:  finding and process
-        
-        repository().findById(bookRent.get???()).ifPresent(book->{
-            
-            book // do something
-            repository().save(book);
+        // Example 2:  finding and process
 
-            RentalStatusUpdated rentalStatusUpdated = new RentalStatusUpdated(book);
-            rentalStatusUpdated.publishAfterCommit();
+        repository().findById(bookRent.getBookId()).ifPresent(book->{
+            if ("available".equals(book.getStatus())) {
+
+                book.setStatus("rental");
+                book.setMemberId(bookRent.getMemberId());
+                repository().save(book);
+
+                RentalStatusUpdated rentalStatusUpdated = new RentalStatusUpdated(book);
+                rentalStatusUpdated.publishAfterCommit();
+
+            } else {
+
+//                Book bookParam = new Book();
+//                bookParam.setId(book.getId());
+//                bookParam.setMemberId(bookRent.getMemberId());
+//                bookParam.setStatus(book.getStatus());
+
+        //        NotAvailableReturned notAvailableReturned = new NotAvailableReturned(this);
+        //        notAvailableReturned.publishAfterCommit();
+
+                NotAvailableReturned notAvailableReturned = new NotAvailableReturned();
+                notAvailableReturned.setId(book.getId());
+                notAvailableReturned.setMemberId(bookRent.getMemberId());
+                notAvailableReturned.setStatus(book.getStatus());
+                notAvailableReturned.publishAfterCommit();
+
+            }
 
          });
-        */
 
     }
 
@@ -90,21 +115,62 @@ public class Book {
         availableStatusUpdated.publishAfterCommit();
         */
 
-        /** Example 2:  finding and process
+        // Example 2:  finding and process
         
-        repository().findById(bookReturned.get???()).ifPresent(book->{
-            
-            book // do something
+        repository().findById(bookReturned.getBookId()).ifPresent(book->{
+
+            book.setStatus("available");
+            book.setMemberId(null);
             repository().save(book);
 
-            AvailableStatusUpdated availableStatusUpdated = new AvailableStatusUpdated(book);
+            Book bookParam = new Book();
+            bookParam.setId(book.getId());
+            bookParam.setMemberId(bookReturned.getMemberId());
+            bookParam.setStatus("available");
+            if ("Y".equals(bookReturned.getOverdueYn()))
+                bookParam.setCost(0);
+            else
+                bookParam.setCost(book.getCost() / 10);
+
+            AvailableStatusUpdated availableStatusUpdated = new AvailableStatusUpdated(bookParam);
             availableStatusUpdated.publishAfterCommit();
 
          });
-        */
 
     }
     //>>> Clean Arch / Port Method
+
+    //>>> Clean Arch / Port Method
+    //<<< Clean Arch / Port Method
+    public static void rollbackBook(LackOfPointsReturned lackOfPointsReturned) {
+        //implement business logic here:
+
+        /** Example 1:  new item
+         Book book = new Book();
+         repository().save(book);
+         BookRollbacked bookRollbacked = new BookRollbacked(book);
+         bookRollbacked.publishAfterCommit();
+         */
+
+        // Example 2:  finding and process
+
+         repository().findById(lackOfPointsReturned.getBookId()).ifPresent(book->{
+
+             Book bookParam = new Book();
+             bookParam.setStatus("available");
+             bookParam.setMemberId(book.getMemberId());
+             bookParam.setCost(book.getCost());
+             bookParam.setId(book.getId());
+
+             book.setStatus("available");
+             book.setMemberId(null);
+             repository().save(book);
+
+             BookRollbacked bookRollbacked = new BookRollbacked(bookParam);
+             bookRollbacked.publishAfterCommit();
+         });
+
+    }
 
 }
 //>>> DDD / Aggregate Root

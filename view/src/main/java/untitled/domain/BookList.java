@@ -13,7 +13,7 @@ import lombok.Data;
 public class BookList {
 
     @Id
-    //@GeneratedValue(strategy=GenerationType.AUTO)
+//    @GeneratedValue(strategy=GenerationType.AUTO)
     private String bookId;
 
     private String rentalStatus;
